@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Random Background Color</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            position: relative;
+        }
+
+        #color-input-container {
+            position: absolute;
+            bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        #color-input {
+            width: 60px;
+            padding: 5px;
+            font-size: 16px;
+            text-transform: uppercase;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        #submit-button {
+            padding: 5px 10px;
+            font-size: 16px;
+            margin-left: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        #score-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        let bgColor = '';
+        let score = 0;
+
+        function generateRandomHexColor() {
+            let hexCode = '#';
+            const hexCharacters = '0123456789ABCDEF';
+            for (let i = 0; i < 6; i++) {
+                hexCode += hexCharacters[Math.floor(Math.random() * 16)];
+            }
+            return hexCode;
+        }
+
+        function setRandomBackgroundColor() {
+            const randomColor = generateRandomHexColor();
+            document.body.style.backgroundColor = randomColor;
+            bgColor = randomColor;
+        }
+
+        function validateHex(hex) {
+            if (hex.length !== 6) {
+                alert('Please enter a valid 6-digit hex color code.');
+                return false;
+            }
+            for (let i = 0; i < 6; i++) {
+                if (!'0123456789ABCDEF'.includes(hex[i].toUpperCase())) {
+                    alert('Please enter a valid 6-digit hex color code.');
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function handleColorInput() {
+            if (bgColor.length === 7) {
+                bgColor = bgColor.substring(1);
+            }
+            const inputColor = document.getElementById('color-input').value;
+            if (!validateHex(inputColor)) {
+                return;
+            }
+            const r1 = parseInt(bgColor.substring(0, 2), 16);
+            const g1 = parseInt(bgColor.substring(2, 4), 16);
+            const b1 = parseInt(bgColor.substring(4, 6), 16);
+            const r2 = parseInt(inputColor.substring(0, 2), 16);
+            const g2 = parseInt(inputColor.substring(2, 4), 16);
+            const b2 = parseInt(inputColor.substring(4, 6), 16);
+            const distance = Math.sqrt(
+                Math.pow(r1 - r2, 2) +
+                Math.pow(g1 - g2, 2) +
+                Math.pow(b1 - b2, 2)
+            );
+            score += Math.round(100 * 0.992 ** distance);
+            document.getElementById('score').innerText = score;
+            document.getElementById('color-input').value = '';
+            setRandomBackgroundColor();
+        }
+
+        window.onload = setRandomBackgroundColor;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const colorInput = document.getElementById('color-input');
+            const submitButton = document.getElementById('submit-button');
+
+            colorInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    handleColorInput();
+                }
+            });
+
+            submitButton.addEventListener('click', handleColorInput);
+        });
+    </script>
+
+    <div id="score-container">
+        Score: <span id="score">0</span>
+    </div>
+
+    <div id="color-input-container">
+        <input type="text" id="color-input" maxlength="6" placeholder="FFFFFF">
+        <span>#</span>
+        <button id="submit-button">Submit</button>
+    </div>
+
+</body>
+
+</html>
